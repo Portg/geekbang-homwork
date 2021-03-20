@@ -1,22 +1,47 @@
 package org.geektimes.projects.user.domain;
 
+import org.geektimes.projects.user.validator.bean.validation.UserMoblieValid;
+import org.geektimes.projects.user.validator.bean.validation.UserValid;
+
+import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Objects;
+
+import static javax.persistence.GenerationType.AUTO;
+import static javax.persistence.GenerationType.SEQUENCE;
 
 /**
  * 用户领域对象
  *
  * @since 1.0
  */
-public class User {
+@Entity
+@Table(name = "users")
+//@UserValid(idRange = 0)
+public class User implements Serializable {
 
+    @Id
+//    @GeneratedValue(strategy=SEQUENCE, generator="USERS_ID_SEQ")
+    @GeneratedValue(strategy = AUTO)
+    @NotNull
     private Long id;
 
+    @Column
     private String name;
 
+    @Column
+    @Size(min = 6, max = 32)
     private String password;
 
+    @Column
     private String email;
 
+    @Column
+    @UserMoblieValid(message = "手机号码格式不正确")
     private String phoneNumber;
 
     public Long getId() {

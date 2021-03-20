@@ -14,10 +14,9 @@ import javax.ws.rs.Path;
 @Path("/user")
 public class HelloWorldController implements PageController {
 
-   @GET
-   @Path("/") // /hello/world -> HelloWorldController
-   public String execute(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-      return "/WEB-INF/jsp/user/register.jsp";
-   }
-
+	@GET
+	@Path("/") // /hello/world -> HelloWorldController
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+		return "/WEB-INF/jsp/user/register.jsp";
+	}
 }

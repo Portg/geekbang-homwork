@@ -1,28 +1,27 @@
 package org.geektimes.web.mvc;
 
 import org.apache.commons.lang.StringUtils;
+import org.geektimes.context.ComponentContext;
 import org.geektimes.web.mvc.controller.Controller;
 import org.geektimes.web.mvc.controller.PageController;
 import org.geektimes.web.mvc.controller.RestController;
-import org.geektimes.web.mvc.header.CacheControlHeaderWriter;
-import org.geektimes.web.mvc.header.annotation.CacheControl;
 
+import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.substringAfter;
@@ -69,9 +68,30 @@ public class FrontControllerServlet extends HttpServlet {
                         new HandlerMethodInfo(requestPath, method, supportedHttpMethods));
             }
             controllersMapping.put(requestPath, controller);
+            injectComponents(controller, controller.getClass());
         }
     }
 
+    private void injectComponents(Object component, Class<?> componentClass) {
+        Stream.of(componentClass.getDeclaredFields())
+                .filter(field -> {
+                    int mods = field.getModifiers();
+                    return !Modifier.isStatic(mods) &&
+                            field.isAnnotationPresent(Resource.class);
+                }).forEach(field -> {
+            Resource resource = field.getAnnotation(Resource.class);
+            String resourceName = resource.name();
+            // 增加 JNDI 引用处理
+            ComponentContext componentContext = ComponentContext.getInstance();
+            Object injectedObject = componentContext.getComponent(resourceName);
+            field.setAccessible(true);
+            try {
+                // 注入目标对象
+                field.set(component, injectedObject);
+            } catch (IllegalAccessException e) {
+            }
+        });
+    }
     /**
      * 获取处理方法中标注的 HTTP方法集合
      *
@@ -136,6 +156,7 @@ public class FrontControllerServlet extends HttpServlet {
                     if (controller instanceof PageController) {
                         PageController pageController = PageController.class.cast(controller);
                         String viewPath = pageController.execute(request, response);
+                        // 反射获取url对应方法
                         // 页面请求 forward
                         // request -> RequestDispatcher forward
                         // RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);
@@ -157,7 +178,7 @@ public class FrontControllerServlet extends HttpServlet {
                 if (throwable.getCause() instanceof IOException) {
                     throw (IOException) throwable.getCause();
                 } else {
-                    throw new ServletException(throwable.getCause());
+                    throw new ServletException(throwable);
                 }
             }
         }
