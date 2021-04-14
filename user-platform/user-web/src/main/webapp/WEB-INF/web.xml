@@ -42,12 +42,18 @@
     <servlet>
         <servlet-name>FrontControllerServlet</servlet-name>
         <servlet-class>org.geektimes.web.mvc.FrontControllerServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>2</load-on-startup>
     </servlet>
 
     <servlet>
         <servlet-name>ErrorHandler</servlet-name>
         <servlet-class>org.geektimes.web.mvc.ErrorHandler</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>jolokia-agent</servlet-name>
+        <servlet-class>org.jolokia.http.AgentServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
@@ -59,6 +65,9 @@
         <servlet-name>ErrorHandler</servlet-name>
         <url-pattern>/error</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping> <servlet-name>jolokia-agent</servlet-name> <url-pattern>/jolokia/*</url-pattern> </servlet-mapping>
+
     <filter>
         <filter-name>CharsetEncodingFilter</filter-name>
         <filter-class>org.geektimes.projects.user.web.filter.CharsetEncodingFilter</filter-class>

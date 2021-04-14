@@ -1,10 +1,16 @@
 package org.geektimes.projects.user.web.listener;
 
 import org.geektimes.context.ComponentContext;
+import org.geektimes.projects.user.domain.User;
+import projects.user.management.UserManager;
+import projects.user.management.UserManagerMBean;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.lang.management.ManagementFactory;
 
 /**
  * {@link ComponentContext} 初始化器
@@ -19,6 +25,17 @@ public class ComponentContextInitializerListener implements ServletContextListen
         this.servletContext = sce.getServletContext();
         ComponentContext context = new ComponentContext();
         context.init(servletContext);
+
+		//加载MBean
+		MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+		ObjectName objectName = null;
+		try {
+			objectName = new ObjectName("org.geektimes.projects.user.management:type=User");
+			User user = new User();
+			mBeanServer.registerMBean(new UserManager(user), objectName);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
     }
 
     @Override
