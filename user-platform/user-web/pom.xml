@@ -83,6 +83,10 @@
             <version>3.0.1-b11</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jolokia</groupId>
+            <artifactId>jolokia-core</artifactId>
+        </dependency>
     </dependencies>
 
 <!--    &lt;!&ndash;这是配置Maven从什么地方下载插件构件（Maven的所有实际行为都由其插件完成）&ndash;&gt;-->

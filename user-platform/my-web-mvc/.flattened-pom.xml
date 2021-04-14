@@ -13,6 +13,11 @@
   <name>My Web-MVC Framework ${revision}</name>
   <dependencies>
     <dependency>
+      <groupId>org.geekbang.projects</groupId>
+      <artifactId>user-core</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>provided</scope>
